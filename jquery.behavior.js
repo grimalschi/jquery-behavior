@@ -1,6 +1,6 @@
 (function ($) {
     var rnotwhite = (/\S+/g);
-    var rtypenamespace = /^([^.]*)(?:\.(.+)|)$/;
+    var rtypenamespace = /^([^.]*)(?:\.(.+)|)/;
     var returnFalse = function () { return false };
 
 
@@ -289,6 +289,14 @@
         // результат фильтрации сюда помещен будет
         var bindings = [];
 
+        // обработка filter() или filter({})
+        if (!('target' in data) && !('types' in data) && !('handler' in data) && !('selector' in data)) {
+            for (var i = 0; i < this.records.length; i++) {
+                [].push.apply(bindings, this.records[i].bindings);
+            }
+            return bindings;
+        }
+
         // данные, по которым будет проводиться фильтрация
         var check = {
             targets: data.target,
@@ -297,7 +305,7 @@
             selector: data.selector
         };
 
-        if (data.target && !(data.target instanceof $)) {
+        if ('target' in data && !(data.target instanceof $)) {
             check.targets = $(data.target);
         }
 
@@ -315,11 +323,8 @@
             }
         }
 
-        // обработка filter() или filter({})
+        // обработка пустого фильтра
         if (!check.targets && !check.types && !check.handler) {
-            for (var i = 0; i < this.records.length; i++) {
-                [].push.apply(bindings, this.records[i].bindings);
-            }
             return bindings;
         }
 
@@ -360,7 +365,7 @@
                 }
 
                 // так же проверяем каждое событие в списке, сравнивая его с биндингом
-                if (check.types) {
+                if (check.types && check.types.length) {
                     var checkType = false;
                     for (var h = 0; h < check.types.length; h++) {
                         // если имя не подходит, неймспейсы не смотрим

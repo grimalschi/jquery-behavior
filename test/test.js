@@ -28,48 +28,622 @@ module("plugin tests", {
     setup: function() {
         document.body.focus();
     },
-    teardown: teardown
+    teardown: function () {
+        behavior.off();
+        moduleTeardown();
+    }
 });
 
-test("filter tests", function() {
-    expect(6);
+test("filter with wrong target", function() {
+    expect(7);
 
     behavior.on({
         target: "#firstp",
-        events: 'click',
+        types: 'click',
         handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "#firstp",
+        types: 'test1.ns',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "body",
+        types: 'test2.ns',
+        handler: function (event) {}
     });
 
     equal(behavior.filter({
         target: []
-    }).length, 0, 'filter with empty target list returns []');
+    }).length, 0, 'target: []');
 
     equal(behavior.filter({
-        target: []
-    }).length, 0, 'filter with empty event list returns []');
+        target: {}
+    }).length, 0, 'target: {}');
 
     equal(behavior.filter({
-        target: []
-    }).length, 0, 'filter with wrong target list returns []');
+        target: jQuery()
+    }).length, 0, 'target: jQuery()');
 
     equal(behavior.filter({
-        events: 'foo'
-    }).length, 0, 'filter with wrong event returns []');
+        target: jQuery("lala")
+    }).length, 0, 'target: jQuery("lala")');
 
     equal(behavior.filter({
-        events: 'click.foo'
-    }).length, 0, 'filter with wrong namespace returns []');
+        target: ''
+    }).length, 0, 'target: ""');
 
     equal(behavior.filter({
-        handler: function () {}
-    }).length, 0, 'filter with wrong handler returns []');
+        target: 'lala'
+    }).length, 0, 'target: "lala"');
+
+    equal(behavior.filter({
+        target: 123
+    }).length, 0, 'target: 123');
 });
 
-module( "default tests", {
+test("filter with correct target", function() {
+    expect(5);
+
+    behavior.on({
+        target: "#firstp",
+        types: 'click',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "#firstp",
+        types: 'test1.ns',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "body",
+        types: 'test2.ns',
+        handler: function (event) {}
+    });
+
+    equal(behavior.filter({
+        target: 'p'
+    }).length, 2, 'target: "p"');
+
+    equal(behavior.filter({
+        target: jQuery('p')
+    }).length, 2, 'target: jQuery("p")');
+
+    equal(behavior.filter({
+        target: 'body'
+    }).length, 1, 'target: "body"');
+
+    equal(behavior.filter({
+        target: 'p, body'
+    }).length, 3, 'target: "p, body"');
+
+    equal(behavior.filter({
+        target: '*'
+    }).length, 3, 'target: "*"');
+});
+
+test("filter with wrong types", function() {
+    expect(9);
+
+    behavior.on({
+        target: "#firstp",
+        types: 'click',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "#firstp",
+        types: 'test1.ns',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "body",
+        types: 'test2.ns',
+        handler: function (event) {}
+    });
+
+    equal(behavior.filter({
+        types: []
+    }).length, 0, 'types: []');
+
+    equal(behavior.filter({
+        types: {}
+    }).length, 0, 'types: {}');
+
+    equal(behavior.filter({
+        types: 123
+    }).length, 0, 'types: 123');
+
+    equal(behavior.filter({
+        types: jQuery()
+    }).length, 0, 'types: jQuery()');
+
+    equal(behavior.filter({
+        types: jQuery("lala")
+    }).length, 0, 'types: jQuery("lala")');
+
+    equal(behavior.filter({
+        types: ''
+    }).length, 0, 'types: ""');
+
+    equal(behavior.filter({
+        types: 'lala'
+    }).length, 0, 'types: "lala"');
+
+    equal(behavior.filter({
+        types: '.lala'
+    }).length, 0, 'types: ".lala"');
+
+    equal(behavior.filter({
+        types: '..ns'
+    }).length, 0, 'types: "..ns"');
+});
+
+test("filter with correct types", function() {
+    expect(4);
+
+    behavior.on({
+        target: "#firstp",
+        types: 'click',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "#firstp",
+        types: 'test1.ns',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "body",
+        types: 'test2.ns',
+        handler: function(event) {}
+    });
+
+    equal(behavior.filter({
+        types: 'test1'
+    }).length, 1, 'types: "test1"');
+
+    equal(behavior.filter({
+        types: 'test2.ns'
+    }).length, 1, 'types: "click.ns"');
+
+    equal(behavior.filter({
+        types: 'click test2'
+    }).length, 2, 'types: "click, test2"');
+
+    equal(behavior.filter({
+        types: '.ns'
+    }).length, 2, 'types: ".ns"');
+});
+
+test("filter with wrong handler", function() {
+    expect(8);
+
+    var fn = function(event) {};
+
+    behavior.on({
+        target: "#firstp",
+        types: 'click',
+        handler: fn
+    });
+
+    behavior.on({
+        target: "#firstp",
+        types: 'test1.ns',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "body",
+        types: 'test2.ns',
+        handler: function(event) {}
+    });
+
+    equal(behavior.filter({
+        handler: 123
+    }).length, 0, 'handler: 123');
+
+    equal(behavior.filter({
+        handler: ''
+    }).length, 0, 'handler: ""');
+
+    equal(behavior.filter({
+        handler: 'fn'
+    }).length, 0, 'handler: "fn"');
+
+    equal(behavior.filter({
+        handler: []
+    }).length, 0, 'handler: []');
+
+    equal(behavior.filter({
+        handler: {}
+    }).length, 0, 'handler: {}');
+
+    equal(behavior.filter({
+        handler: jQuery()
+    }).length, 0, 'handler: jQuery()');
+
+    equal(behavior.filter({
+        handler: jQuery
+    }).length, 0, 'handler: jQuery');
+
+    equal(behavior.filter({
+        handler: function(event) {}
+    }).length, 0, 'handler: function(event) {}');
+});
+
+test("filter with correct handler", function() {
+    expect(1);
+
+    var fn = function(event) {};
+
+    behavior.on({
+        target: "#firstp",
+        types: 'click',
+        handler: fn
+    });
+
+    behavior.on({
+        target: "#firstp",
+        types: 'test1.ns',
+        handler: fn
+    });
+
+    behavior.on({
+        target: "body",
+        types: 'test2.ns',
+        handler: function(event) {}
+    });
+
+    equal(behavior.filter({
+        handler: fn
+    }).length, 2, 'handler: fn');
+});
+
+test("filter with wrong selector", function() {
+    expect(3);
+
+    behavior.on({
+        target: "body",
+        types: 'click',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "body",
+        types: 'click',
+        selector: 'div',
+        handler: function(event) {}
+    });
+
+    equal(behavior.filter({
+        selector: '*'
+    }).length, 0, 'selector: "*"');
+
+    equal(behavior.filter({
+        selector: '**'
+    }).length, 0, 'selector: "**"');
+
+    equal(behavior.filter({
+        selector: 'div'
+    }).length, 0, 'selector: "div"');
+});
+
+test("filter with wrong combinations", function() {
+    expect(6);
+
+    var fn = function(event) {};
+    var fn2 = function(event) {};
+
+    behavior.on({
+        target: "#firstp",
+        types: 'click',
+        handler: fn
+    });
+
+    behavior.on({
+        target: "#firstp",
+        types: 'click',
+        handler: fn2
+    });
+
+    behavior.on({
+        target: "#firstp",
+        types: 'test1.ns',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "#firstp",
+        types: 'click',
+        handler: fn2
+    });
+
+    behavior.on({
+        target: "body",
+        types: 'click.ns2',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "body",
+        types: 'click.ns2',
+        selector: 'div',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "body",
+        types: 'click.ns2',
+        selector: 'a',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "body",
+        types: 'test2.ns.ns2',
+        handler: function(event) {}
+    });
+
+    equal(behavior.filter({
+        target: "#firstp",
+        types: '.ns2'
+    }).length, 0, 'target: "#firstp", types: ".ns2"');
+
+    equal(behavior.filter({
+        types: 'test2',
+        handler: fn
+    }).length, 0, 'types: "test2", handler: fn');
+
+    equal(behavior.filter({
+        types: 'click',
+        handler: function(event) {}
+    }).length, 0, 'types: "click", handler: function(event) {}');
+
+    equal(behavior.filter({
+        target: "#firstp",
+        handler: function(event) {}
+    }).length, 0, 'target: "#firstp", handler: function(event) {}');
+
+    equal(behavior.filter({
+        target: "#firstp",
+        selector: '.btn'
+    }).length, 0, 'target: "#firstp", selector: ".btn"');
+
+    equal(behavior.filter({
+        target: "#firstp",
+        selector: '**'
+    }).length, 0, 'target: "#firstp", selector: "**"');
+});
+
+test("filter with correct combinations", function() {
+    expect(6);
+
+    var fn = function(event) {};
+    var fn2 = function(event) {};
+
+    behavior.on({
+        target: "#firstp",
+        types: 'click',
+        handler: fn
+    });
+
+    behavior.on({
+        target: "#firstp",
+        types: 'click',
+        handler: fn2
+    });
+
+    behavior.on({
+        target: "#firstp",
+        types: 'test1.ns',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "#firstp",
+        types: 'click',
+        handler: fn2
+    });
+
+    behavior.on({
+        target: "body",
+        types: 'click.ns2',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "body",
+        types: 'click.ns2',
+        selector: 'div',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "body",
+        types: 'click.ns2',
+        selector: 'a',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "body",
+        types: 'test2.ns.ns2',
+        handler: function(event) {}
+    });
+
+    behavior.on({
+        target: "body",
+        types: 'test2.ns.ns2',
+        selector: 'a',
+        handler: function(event) {}
+    });
+
+    equal(behavior.filter({
+        target: "#firstp",
+        types: '.ns'
+    }).length, 1, 'target: "#firstp", types: ".ns"');
+
+    equal(behavior.filter({
+        types: 'click',
+        handler: fn
+    }).length, 1, 'types: "click", handler: fn');
+
+    equal(behavior.filter({
+        types: 'click',
+        handler: fn2
+    }).length, 2, 'types: "click", handler: fn2');
+
+    equal(behavior.filter({
+        target: "body",
+        selector: 'div'
+    }).length, 1, 'target: "body", selector: "div"');
+
+    equal(behavior.filter({
+        target: "body",
+        selector: '**'
+    }).length, 3, 'target: "body", selector: "**"');
+
+    equal(behavior.filter({
+        target: "body",
+        types: ".ns",
+        selector: '**'
+    }).length, 1, 'target: "body", types: ".ns", selector: "**"');
+});
+
+test("pause/resume events", function() {
+    expect(6);
+
+    var calls = 0;
+
+    behavior.on({
+        target: "#firstp",
+        types: 'click.ns1',
+        handler: function(event) {
+            calls++;
+        }
+    });
+
+    behavior("#firstp").trigger('click');
+
+    equal(calls, 1, 'first handler work');
+
+    behavior.on({
+        target: "#firstp",
+        types: 'click.ns2',
+        handler: function(event) {
+            calls++;
+        }
+    });
+
+    behavior("#firstp").trigger('click');
+
+    equal(calls, 3, 'second handler work');
+
+    behavior.pause({
+        types: '.ns1',
+    });
+
+    behavior("#firstp").trigger('click');
+
+    equal(calls, 4, 'pause first handler');
+
+    behavior.pause({
+        types: '.ns2',
+    });
+
+    behavior("#firstp").trigger('click');
+
+    equal(calls, 4, 'pause second handler');
+
+    behavior.resume({
+        types: '.ns1',
+    });
+
+    behavior("#firstp").trigger('click');
+
+    equal(calls, 5, 'resume first handler');
+
+    behavior.resume({
+        types: '.ns2',
+    });
+
+    behavior("#firstp").trigger('click');
+
+    equal(calls, 7, 'resume second handler');
+});
+
+test("start/stop behavior", function() {
+    expect(5);
+
+    var calls = 0;
+
+    behavior.on({
+        target: "#firstp",
+        types: 'click.ns1',
+        handler: function(event) {
+            calls++;
+        }
+    });
+
+    behavior("#firstp").trigger('click');
+
+    equal(calls, 1, 'first handler work');
+
+    behavior.on({
+        target: "#firstp",
+        types: 'click.ns2',
+        handler: function(event) {
+            calls++;
+        }
+    });
+
+    behavior("#firstp").trigger('click');
+
+    equal(calls, 3, 'second handler work');
+
+    behavior.stop();
+
+    behavior("#firstp").trigger('click');
+
+    equal(calls, 3, 'stop behavior');
+
+    behavior.on({
+        target: "#firstp",
+        types: 'click.ns2',
+        handler: function(event) {
+            calls++;
+        }
+    });
+
+    behavior("#firstp").trigger('click');
+
+    equal(calls, 3, 'handler, added after stop will be stoped');
+
+    behavior.start();
+
+    behavior("#firstp").trigger('click');
+
+    equal(calls, 6, 'all handlers works after start');
+});
+
+module( "adapted jquery tests", {
     setup: function() {
         document.body.focus();
     },
-    teardown: teardown
+    teardown: function () {
+        moduleTeardown();
+        if (behavior.records.length) {
+            equal(behavior.records.length, 0, "No unit tests leak memory from behavior.records");
+            behavior.off();
+        }
+    }
 });
 
 test("null or undefined handler", function() {
