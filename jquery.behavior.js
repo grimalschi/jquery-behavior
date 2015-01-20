@@ -89,6 +89,7 @@
             records: this.records,
             stopped: this.stopped,
             log: this.log,
+            logFn: this.logFn,
             onStart: this.onStart,
             onStop: this.onStop,
             onFire: this.onFire
