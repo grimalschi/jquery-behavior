@@ -186,13 +186,13 @@
                 };
 
                 // последняя обертка обрабочика, которая следит за паузами, выводит лог и т.д.
-                binding.handler = function (event) {
+                binding.handler = function () {
                     if (binding.paused || behavior.stopped) return;
                     var before = record.calls;
                     var result = record.wrapHandler.apply(this, arguments);
                     if (before === record.calls) return;
                     binding.calls++;
-                    if (behavior.onFire) behavior.onFire(event);
+                    if (behavior.onFire) behavior.onFire.call(this, arguments);
                     if (behavior.log && record.log && binding.log) {
                         if (behavior.logFn) {
                             var args = ['fire', behavior].concat([].slice.call(arguments));
