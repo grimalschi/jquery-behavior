@@ -49,6 +49,13 @@
     };
 
 
+    if (!window.console || typeof console.log !== 'function') {
+        var console = {
+            log: function () {}
+        };
+    }
+
+
     var extend = {};
 
     extend.start = function (data) {
