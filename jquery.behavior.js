@@ -49,7 +49,7 @@
     };
 
 
-    if (!window.console || typeof console.log !== 'function') {
+    if (!window.console || typeof window.console.log !== 'function') {
         var console = {
             log: function () {}
         };
