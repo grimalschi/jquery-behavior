@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>jquery-behavior example</title>
+    <style>
+        div {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: red;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="./jquery.behavior.js"></script>
+    <script>
+        $(function () {
+            var bhvrWait = $.Behavior();
+
+            bhvrWait('div').on('mousedown', function (e) {
+                bhvrWait.stop();
+
+                var $div = $(this);
+                var offset = $div.offset();
+                bhvrDrag.start({
+                    $div: $div,
+                    offsetX: offset.left - e.pageX,
+                    offsetY: offset.top - e.pageY
+                });
+            });
+
+            var $draggable;
+            var offsetX, offsetY;
+            var bhvrDrag = $.Behavior({
+                active: false,
+                onStart: function (data) {
+                    offsetX = data.offsetX;
+                    offsetY = data.offsetY;
+                    $draggable = data.$div;
+                }
+            });
+
+            bhvrDrag(document).on('mousemove', function (e) {
+                $draggable.css({
+                    left: e.pageX + offsetX,
+                    top: e.pageY + offsetY
+                });
+            });
+
+            bhvrDrag(document).on('mouseup', function (e) {
+                bhvrDrag.stop();
+                bhvrWait.start();
+            });
+        });
+    </script>
+</head>
+<body>
+<div style="left: 80px; top: 0px;"></div>
+<div style="left: 120px; top: 0px;"></div>
+<div style="left: 160px; top: 0px;"></div>
+<div style="left: 200px; top: 0px;"></div>
+<div style="left: 240px; top: 0px;"></div>
+
+<div style="left: 40px; top: 40px;"></div>
+
+<div style="left: 0px; top: 80px;"></div>
+<div style="left: 0px; top: 120px;"></div>
+<div style="left: 0px; top: 160px;"></div>
+<div style="left: 0px; top: 200px;"></div>
+
+<div style="left: 40px; top: 240px;"></div>
+
+<div style="left: 80px; top: 280px;"></div>
+<div style="left: 120px; top: 280px;"></div>
+<div style="left: 160px; top: 280px;"></div>
+<div style="left: 200px; top: 280px;"></div>
+<div style="left: 240px; top: 280px;"></div>
+
+<div style="left: 280px; top: 240px;"></div>
+
+<div style="left: 320px; top: 200px;"></div>
+<div style="left: 320px; top: 160px;"></div>
+<div style="left: 320px; top: 120px;"></div>
+<div style="left: 320px; top: 80px;"></div>
+
+<div style="left: 280px; top: 40px;"></div>
+
+
+<div style="left: 120px; top: 80px;"></div>
+<div style="left: 200px; top: 80px;"></div>
+
+<div style="left: 80px; top: 160px;"></div>
+<div style="left: 120px; top: 200px;"></div>
+<div style="left: 160px; top: 200px;"></div>
+<div style="left: 200px; top: 200px;"></div>
+<div style="left: 240px; top: 160px;"></div>
+</body>
+</html>
