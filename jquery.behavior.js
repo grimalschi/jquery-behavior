@@ -62,7 +62,7 @@
         if (!this.stopped) return this;
         this.stopped = false;
         if (this.onStart) this.onStart(data);
-        $(this[this.namespace]).triggerHandler('start');
+        $(this[this.namespace]).triggerHandler('start', data);
         if (this.log) {
             if (this.logFn) {
                 var args = ['start', this].concat([].slice.call(arguments));
@@ -77,7 +77,7 @@
     extend.stop = function (data) {
         if (this.stopped) return this;
         if (this.onStop) this.onStop(data);
-        $(this[this.namespace]).triggerHandler('stop');
+        $(this[this.namespace]).triggerHandler('stop', data);
         this.stopped = true;
         if (this.log) {
             if (this.logFn) {
