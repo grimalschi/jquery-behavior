@@ -53,6 +53,8 @@
         var console = {
             log: function () {}
         };
+    } else {
+        var console = window.console;
     }
 
 
